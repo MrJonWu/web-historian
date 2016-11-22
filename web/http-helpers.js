@@ -28,13 +28,13 @@ exports.serveAssets = function(res, asset, statusCode, callback) {
   // css, or anything that doesn't change often.)
 };
 
-exports.collectData = function(res, callback) {
+exports.collectData = function(req, callback) {
   var data = '';
   req.on('data', function(chunk) {
     data += chunk;
   });
   req.on('end', function() {
-    callback(JSON.parse(data));
+    callback(data.slice(4));
   });
 };
 

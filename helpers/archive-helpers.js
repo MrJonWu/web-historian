@@ -40,7 +40,7 @@ exports.isUrlInList = function(url, callback) {
 };
 
 exports.addUrlToList = function(url, callback) {
-  fs.writeFile(paths.list, url, 'utf8', function(err) {
+  fs.appendFile(paths.list, url, 'utf8', function(err) {
     if (err) {
       return console.log(err);
     }
@@ -48,7 +48,7 @@ exports.addUrlToList = function(url, callback) {
   });
 };
 
-exports.isUrlArchived = function(url, callback) {
+var isUrlArchived = function(url, callback) {
   var query = paths.archivedSites + '/' + url;
   fs.access(query, fs.F_OK, function(err) {
     callback(!err);
@@ -56,9 +56,14 @@ exports.isUrlArchived = function(url, callback) {
 };
 
 exports.downloadUrls = function(urlArray) {
-  urlArray.forEach(function(element) {
-    fs.writeFile(paths.archivedSites + '/' + element);
+  urlArray.forEach(function(url) {
+    isUrlArchived(url, function(exists) {
+      if (!exists) {
+        fs.appendFile(paths.archivedSites + '/' + url);
+      }
+    });
   });
 };
 
 exports.paths = paths;
+exports.isUrlArchived = isUrlArchived;
