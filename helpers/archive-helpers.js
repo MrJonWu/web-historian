@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var http = require('http');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -9,7 +10,7 @@ var _ = require('underscore');
  * customize it in any way you wish.
  */
 
-exports.paths = {
+var paths = {
   siteAssets: path.join(__dirname, '../web/public'),
   archivedSites: path.join(__dirname, '../archives/sites'),
   list: path.join(__dirname, '../archives/sites.txt')
@@ -25,17 +26,39 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function() {
+exports.readListOfUrls = function(callback) {
+  fs.readFile(paths.list, 'utf8', function(err, data) {
+    callback(data.split('\n'));
+  });
 };
 
-exports.isUrlInList = function() {
+exports.isUrlInList = function(url, callback) {
+  fs.readFile(paths.list, 'utf8', function(err, data) {
+    var urlArray = data.split('\n');
+    callback(urlArray.indexOf(url) > -1);
+  });
 };
 
-exports.addUrlToList = function() {
+exports.addUrlToList = function(url, callback) {
+  fs.writeFile(paths.list, url, 'utf8', function(err) {
+    if (err) {
+      return console.log(err);
+    }
+    callback();
+  });
 };
 
-exports.isUrlArchived = function() {
+exports.isUrlArchived = function(url, callback) {
+  var query = paths.archivedSites + '/' + url;
+  fs.access(query, fs.F_OK, function(err) {
+    callback(!err);
+  });
 };
 
-exports.downloadUrls = function() {
+exports.downloadUrls = function(urlArray) {
+  urlArray.forEach(function(element) {
+    fs.writeFile(paths.archivedSites + '/' + element);
+  });
 };
+
+exports.paths = paths;
