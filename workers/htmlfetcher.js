@@ -24,3 +24,20 @@ archive.readListOfUrls(function(urlArray) {
     });
   });
 });
+
+// archive.readListOfUrls(function(urlArray) {
+  
+//   return archive.readListOfUrlsAsync(urlArray)
+//       .then(function(url) {
+//         return archive.isUrlArchivedAsync(url);
+//       })
+//       .then(function(exists) {
+//         if (!exists) {
+//           request('http://' + url, function(error, response, body) {
+//             if (!error && response.statusCode === 200) {
+//               fs.writeFile(archive.paths.archivedSites + '/' + url, body);
+//             }
+//           });
+//         }
+//       });
+// });

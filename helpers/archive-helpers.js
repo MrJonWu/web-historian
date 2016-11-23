@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var http = require('http');
+var Promise = require('bluebird');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -26,20 +27,24 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function(callback) {
+var readListOfUrls = function(callback) {
   fs.readFile(paths.list, 'utf8', function(err, data) {
     callback(data.split('\n'));
   });
 };
 
-exports.isUrlInList = function(url, callback) {
+var readListOfUrlsAsync = Promise.promisify(readListOfUrls);
+
+var isUrlInList = function(url, callback) {
   fs.readFile(paths.list, 'utf8', function(err, data) {
     var urlArray = data.split('\n');
     callback(urlArray.indexOf(url) > -1);
   });
 };
 
-exports.addUrlToList = function(url, callback) {
+var isUrlInListAsync = Promise.promisify(isUrlInList);
+
+var addUrlToList = function(url, callback) {
   fs.appendFile(paths.list, url, 'utf8', function(err) {
     if (err) {
       return console.log(err);
@@ -48,6 +53,8 @@ exports.addUrlToList = function(url, callback) {
   });
 };
 
+var addUrlToListAsync = Promise.promisify(addUrlToList);
+
 var isUrlArchived = function(url, callback) {
   var query = paths.archivedSites + '/' + url;
   fs.access(query, fs.F_OK, function(err) {
@@ -55,7 +62,9 @@ var isUrlArchived = function(url, callback) {
   });
 };
 
-exports.downloadUrls = function(urlArray) {
+var isUrlArchivedAsync = Promise.promisify(isUrlArchived);
+
+var downloadUrls = function(urlArray) {
   urlArray.forEach(function(url) {
     isUrlArchived(url, function(exists) {
       if (!exists) {
@@ -65,5 +74,18 @@ exports.downloadUrls = function(urlArray) {
   });
 };
 
+var downloadUrlsAsync = Promise.promisify(downloadUrls);
+
 exports.paths = paths;
+
+exports.readListOfUrls = readListOfUrls;
+exports.isUrlInList = isUrlInList;
+exports.addUrlToList = addUrlToList;
 exports.isUrlArchived = isUrlArchived;
+exports.downloadUrls = downloadUrls;
+
+exports.readListOfUrlsAsync = readListOfUrlsAsync;
+exports.isUrlInListAsync = isUrlInListAsync;
+exports.addUrlToListAsync = addUrlToListAsync;
+exports.isUrlArchivedAsync = isUrlArchivedAsync;
+exports.downloadUrlsAsync = downloadUrlsAsync;
